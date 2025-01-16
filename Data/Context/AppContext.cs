@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace Data.Context
 {
-    public class Context :DbContext
+    public class AppContext :DbContext
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Deck> Decks { get; set; }
         public DbSet<Card> Cards { get; set; }
         public DbSet<Synonym> Synonyms { get; set; }
 
-        public Context(DbContextOptions<Context> options) : base(options)
+        public AppContext(DbContextOptions<AppContext> options) : base(options)
         {
         }
     }
