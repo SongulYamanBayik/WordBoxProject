@@ -1,4 +1,5 @@
 ﻿using Core.Interfaces;
+using Data.Context;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,10 @@ namespace Data.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        protected readonly DbContext _context;
+        protected readonly Context.AppContext _context;
         protected readonly DbSet<T> _dbSet;
 
-        public GenericRepository(DbContext context)
+        public GenericRepository(Context.AppContext context)
         {
             _context = context;
             _dbSet = _context.Set<T>();
