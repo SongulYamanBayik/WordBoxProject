@@ -14,12 +14,16 @@ const Sidebar = () => {
             📊 Dashboard
           </Link>
         </li>
-        <li>
-          <Link to="/settings" className="nav-link text-white">
-            ⚙️ Settings
-          </Link>
-        </li>
       </ul>
+      <div className="mt-auto">
+        <ul className="nav nav-pills flex-column">
+          <li>
+            <Link to="/settings" className="nav-link text-white">
+              ⚙️ Settings
+            </Link>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 };

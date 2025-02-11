@@ -9,7 +9,7 @@ const Navbar = () => {
         placeholder="Search..."
       />
       <div>
-        <span className="mx-3">🔔 Bildirimler</span>
+        <span className="mx-3">🔔 Notifications</span>
       </div>
     </nav>
   );
