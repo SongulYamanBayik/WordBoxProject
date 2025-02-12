@@ -19,8 +19,14 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddControllers();
 
-builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
+//builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<ICardRepository, CardRepository>();
+builder.Services.AddScoped<IDeckRepository, DeckRepository>();
+
+
+builder.Services.AddScoped<IDeckService, DeckService>();
+builder.Services.AddScoped<ICardService, CardService>();
 
 var app = builder.Build();
 

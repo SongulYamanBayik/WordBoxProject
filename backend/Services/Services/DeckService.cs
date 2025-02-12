@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Services.Services
 {
-    public class CardService : GenericService<Card>, ICardService
+    public class DeckService : GenericService<Deck>, IDeckService
     {
-        public CardService(IGenericRepository<Card> repository) : base(repository)
+        public DeckService(IGenericRepository<Deck> repository) : base(repository)
         {
         }
     }

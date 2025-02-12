@@ -6,11 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.Services
+namespace Data.Repositories
 {
-    public class CardService : GenericService<Card>, ICardService
+    public class DeckRepository : GenericRepository<Deck>, IDeckRepository
     {
-        public CardService(IGenericRepository<Card> repository) : base(repository)
+        public DeckRepository(Context.AppContext context) : base(context)
         {
         }
     }
