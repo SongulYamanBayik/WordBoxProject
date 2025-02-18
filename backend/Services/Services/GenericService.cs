@@ -1,4 +1,5 @@
 ﻿using Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,9 +28,9 @@ namespace Services.Services
             await _repository.DeleteAsync(id);
         }
 
-        public async Task<IEnumerable<T>> TGetAllAsync()
+        public async Task<IEnumerable<T>> TGetAllAsync(params Expression<Func<T, object>>[] includes)
         {
-            return await _repository.GetAllAsync();
+            return await _repository.GetAllAsync(includes);
         }
 
         public async Task<T> TGetByIdAsync(int id)

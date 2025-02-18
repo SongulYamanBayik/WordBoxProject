@@ -2,6 +2,7 @@
 using Core.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace API.Controllers
 {
@@ -19,8 +20,14 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Deck>>> GetAllDecks()
         {
-            var decks = await _deckService.TGetAllAsync();
-            return Ok(decks);
+            var decks = await _deckService.TGetAllAsync(d => d.Cards);
+            var result = decks.Select(d => new
+            {
+                d.DeckId,
+                d.DeckName,
+                CardCount = d.Cards != null ? d.Cards.Count : 0
+            });
+            return Ok(result);
         }
 
         [HttpGet("{id}")]

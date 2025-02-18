@@ -10,10 +10,10 @@ namespace Core.Interfaces
     public interface IGenericService<T> where T : class
     {
         Task<T> TGetByIdAsync(int id);
-        Task<IEnumerable<T>> TGetAllAsync();
         Task<IEnumerable<T>> TWhere(Expression<Func<T, bool>> predicate);
         Task TAddAsync(T entity);
         Task TUpdateAsync(T entity);
         Task TDeleteAsync(int id);
+        Task<IEnumerable<T>> TGetAllAsync(params Expression<Func<T, object>>[] includes);
     }
 }

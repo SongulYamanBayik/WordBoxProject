@@ -6,6 +6,17 @@ using Services.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// CORS Policy Tanýmlýyoruz
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
 // Add services to the container.
 
 builder.Services.AddDbContext<Data.Context.AppContext>(options =>
@@ -19,7 +30,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddControllers();
 
-//builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
+builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<ICardRepository, CardRepository>();
 builder.Services.AddScoped<IDeckRepository, DeckRepository>();
@@ -37,6 +48,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowAll");
 app.UseAuthorization();
 
 app.MapControllers();

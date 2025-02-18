@@ -26,9 +26,16 @@ namespace Data.Repositories
             return await _dbSet.FindAsync(id);
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object>>[] includes)
         {
-            return await _dbSet.ToListAsync();
+            IQueryable<T> query = _dbSet;
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.ToListAsync();
         }
 
         public async Task<IEnumerable<T>> Where(Expression<Func<T, bool>> predicate)
@@ -56,6 +63,11 @@ namespace Data.Repositories
                 _dbSet.Remove(entity);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public IQueryable<T> GetQueryable()
+        {
+            return _context.Set<T>().AsQueryable();
         }
     }
 }
