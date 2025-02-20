@@ -1,4 +1,5 @@
-﻿using Core.Entities;
+﻿using Core.Dtos;
+using Core.Entities;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,15 +19,15 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Deck>>> GetAllDecks()
+        public async Task<ActionResult<IEnumerable<DeckListDto>>> GetAllDecks()
         {
             var decks = await _deckService.TGetAllAsync(d => d.Cards);
-            var result = decks.Select(d => new
+            var result = decks.Select(d => new DeckListDto
             {
-                d.DeckId,
-                d.DeckName,
-                CardCount = d.Cards != null ? d.Cards.Count : 0
-            });
+                DeckId=d.DeckId,
+                DeckName=d.DeckName,
+                CardCount=d.Cards.Count
+            }).ToList();
             return Ok(result);
         }
 

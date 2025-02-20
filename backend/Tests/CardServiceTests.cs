@@ -2,11 +2,10 @@
 using Core.Interfaces;
 using Moq;
 using Services.Services;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace Tests
 {
@@ -70,6 +69,20 @@ namespace Tests
 
             // Assert
             _mockCardRepository.Verify(repo => repo.AddAsync(newCard), Times.Once);
+        }
+
+        [Fact]
+        public async Task UpdateAsync_ShouldCallUpdateOnce()
+        {
+            // Arrange
+            var existingCard = new Card { CardId = 2, FrontText = "Table", BackText = "Masa" };
+
+            // Act
+            existingCard.FrontText = "Desk";
+            await _cardService.TUpdateAsync(existingCard);
+
+            // Assert
+            _mockCardRepository.Verify(repo => repo.UpdateAsync(existingCard), Times.Once);
         }
 
         [Fact]
