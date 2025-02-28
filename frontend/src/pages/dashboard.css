@@ -1,58 +1,49 @@
-/* Ana Konteyner */
-.dashboard-container {
-    text-align: center;
-    margin-top: 20px;
-  }
-  
-  /* Deste Alanı Kutusu */
-  .deck-area {
-    position: relative;
-    padding: 20px;
-    margin-top: 20px;
-    border: 2px solid #ccc;
-    border-radius: 15px;
-    min-height: 150px;
-    background-color: #f8f9fa;
-  }
-  
-  /* Deck Kutucukları */
-  .deck-card {
-    width: 160px;
-    padding: 10px;
-    margin: 5px;
-    border-radius: 8px;
-    color: white;
-    text-align: center;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-  
-  /* Uzun metinler için ellipsis */
-  .deck-card h5 {
-    font-size: 18px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 100%;
-  }
-  
-  /* Kelime sayısı */
-  .deck-card p {
-    font-size: 14px;
-    margin: 0;
-  }
-  
-  /* Yeni Deste Ekle Butonu */
-  .add-deck-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-  }
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.modal-content input {
+  width: 80%;
+  padding: 8px;
+  margin: 10px 0;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-actions button {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+/* Deck Silme Butonu */
+.delete-btn {
+  background: red;
+  border: none;
+  color: white;
+  padding: 5px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+}
