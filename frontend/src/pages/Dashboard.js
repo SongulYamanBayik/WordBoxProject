@@ -1,23 +1,30 @@
 import React, { useState, useEffect } from "react";
-import "./dashboard.css";
+import "bootstrap-icons/font/bootstrap-icons.css"; // Bootstrap ikonları
+import "./dashboard.css"; // CSS dosyasını içeri aktarıyoruz
 
 const Dashboard = () => {
-  const colors = ["#FFA500", "#4682B4", "#2F9E44", "#DC143C", "#8A2BE2"];
+  const colors = ["#FFA500", "#4682B4", "#2F9E44", "#DC143C", "#8A2BE2"]; // Turuncu, Mavi, Yeşil, Kırmızı, Mor
   const [decks, setDecks] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [deckData, setDeckData] = useState({ id: null, name: "", count: 0 });
-  const API_URL = "http://localhost:5146/api/deck";
+  const [deckName, setDeckName] = useState("");
+  const API_URL = "http://localhost:5146/api/deck"; // Backend API URL
 
   // API'den Deck'leri Çek
   useEffect(() => {
     fetch(API_URL)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Veri çekilemedi!");
+        }
+        return res.json();
+      })
       .then((data) => {
+        // API'den gelen deck listesini state'e kaydediyoruz
         const updatedDecks = data.map((deck, index) => ({
           id: deck.deckId,
           name: deck.deckName,
-          count: deck.cardCount || 0,
-          color: colors[index % colors.length],
+          count: deck.cardCount || 0, // Eğer backend'den count gelmezse 0 olsun
+          color: colors[index % colors.length], // Renkleri sırayla ata
         }));
         setDecks(updatedDecks);
       })
@@ -25,58 +32,38 @@ const Dashboard = () => {
   }, []);
 
   // Modal Aç/Kapat
-  const openModal = (deck = { id: null, name: "", count: 0 }) => {
-    setDeckData(deck);
+  const openModal = () => {
+    setDeckName(""); // Yeni ekleme için input'u sıfırla
     setModalOpen(true);
   };
 
   const closeModal = () => {
     setModalOpen(false);
-    setDeckData({ id: null, name: "", count: 0 });
   };
 
-  // Deck Ekle veya Güncelle
+  // Yeni Deck Kaydet
   const handleSave = () => {
-    const method = deckData.id ? "PUT" : "POST";
-    const url = deckData.id ? `${API_URL}/${deckData.id}` : API_URL;
+    if (!deckName.trim()) return; // Boş kayıt yapma
 
-    fetch(url, {
-      method: method,
+    fetch(API_URL, {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ deckId: deckData.id, deckName: deckData.name }),
+      body: JSON.stringify({ deckName }),
     })
       .then((res) => res.json())
-      .then((updatedDeck) => {
-        if (deckData.id) {
-          // Güncelleme
-          setDecks(
-            decks.map((deck) =>
-              deck.id === updatedDeck.deckId
-                ? { ...deck, name: updatedDeck.deckName }
-                : deck
-            )
-          );
-        } else {
-          // Yeni Ekleme
-          setDecks([
-            ...decks,
-            { ...updatedDeck, color: colors[decks.length % colors.length] },
-          ]);
-        }
+      .then((newDeck) => {
+        setDecks([
+          ...decks,
+          { ...newDeck, color: colors[decks.length % colors.length] },
+        ]); // Yeni deck eklenirken renk atanıyor
         closeModal();
       })
       .catch((error) => console.error("Hata oluştu:", error));
   };
 
-  // Deck Sil
-  const handleDelete = (id) => {
-    fetch(`${API_URL}/${id}`, { method: "DELETE" })
-      .then(() => setDecks(decks.filter((deck) => deck.id !== id)))
-      .catch((error) => console.error("Hata oluştu:", error));
-  };
-
   return (
     <div className="dashboard-container">
+      {/* Deste Alanı Kutusu */}
       <div className="deck-area">
         <h1 style={{ textAlign: "left" }}>Decks</h1>
         <div className="d-flex justify-content-start flex-wrap">
@@ -89,45 +76,41 @@ const Dashboard = () => {
                 className="deck-card"
                 style={{ backgroundColor: deck.color }}
                 title={deck.name}
-                onClick={() => openModal(deck)} // 🔥 Güncellemek için tıklanabilir
               >
                 <h5>{deck.name}</h5>
-                <p>{deck.count} cards</p>
-                <button
-                  className="delete-btn"
-                  onClick={(e) => {
-                    e.stopPropagation(); // Modal açılmasını engelle
-                    handleDelete(deck.id);
-                  }}
-                >
-                  🗑️
-                </button>
+                <p>{deck.count} cards</p> {/* Kart sayısını gösteriyoruz */}
               </div>
             ))
           )}
         </div>
 
         {/* Yeni Deste Ekle Butonu */}
-        <button className="add-deck-btn" onClick={() => openModal()}>
+        <button className="add-deck-btn" onClick={openModal}>
           ➕
         </button>
 
         {/* Modal */}
         {modalOpen && (
           <div className="modal">
-            <div className="modal-content">
-              <h2>{deckData.id ? "Deste Güncelle" : "Yeni Deste Ekle"}</h2>
+            <div className="modal-content small-modal">
+              <button className="close-btn" onClick={closeModal}>
+                <i className="bi bi-x-lg"></i> {/* Bootstrap X ikonu */}
+              </button>
+              <h2>New Deck</h2>
+              <label>Deck Name:</label>
               <input
                 type="text"
-                placeholder="Deste Adı"
-                value={deckData.name}
-                onChange={(e) =>
-                  setDeckData({ ...deckData, name: e.target.value })
-                }
+                value={deckName}
+                onChange={(e) => setDeckName(e.target.value)}
+                placeholder="Enter deck name"
               />
               <div className="modal-actions">
-                <button onClick={handleSave}>Kaydet</button>
-                <button onClick={closeModal}>İptal</button>
+                <button className="save-btn" onClick={handleSave}>
+                  Save
+                </button>
+                <button className="cancel-btn" onClick={closeModal}>
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
