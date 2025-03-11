@@ -6,7 +6,10 @@ const Dashboard = () => {
   const colors = ["#FFA500", "#4682B4", "#2F9E44", "#DC143C", "#8A2BE2"]; // Turuncu, Mavi, Yeşil, Kırmızı, Mor
   const [decks, setDecks] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [deckName, setDeckName] = useState("");
+  const [selectedDeck, setSelectedDeck] = useState(null); // Seçili Deck
+  const [menuOpen, setMenuOpen] = useState(null); // Ayarlar Menüsü Açık mı?
   const API_URL = "http://localhost:5146/api/deck"; // Backend API URL
 
   // API'den Deck'leri Çek
@@ -52,13 +55,60 @@ const Dashboard = () => {
     })
       .then((res) => res.json())
       .then((newDeck) => {
-        setDecks([
-          ...decks,
-          { ...newDeck, color: colors[decks.length % colors.length] },
-        ]); // Yeni deck eklenirken renk atanıyor
+        const updatedDeck = {
+          id: newDeck.deckId || newDeck.id, // ID'yi al
+          name: newDeck.deckName || deckName, // Gelen veride deckName varsa onu kullan, yoksa inputtan al
+          count: newDeck.cardCount || 0, // Kart sayısı gelmezse 0 olarak ata
+          color: colors[decks.length % colors.length], // Renk ata
+        };
+
+        setDecks([...decks, updatedDeck]);
         closeModal();
       })
       .catch((error) => console.error("Hata oluştu:", error));
+  };
+
+  // Ayarlar Menüsünü Aç/Kapat
+  const toggleMenu = (deckId) => {
+    setMenuOpen(menuOpen === deckId ? null : deckId);
+  };
+
+  // Deck'i Sil
+  const deleteDeck = (deckId) => {
+    fetch(`${API_URL}/${deckId}`, { method: "DELETE" })
+      .then(() => {
+        setDecks(decks.filter((deck) => deck.id !== deckId));
+        setMenuOpen(null);
+      })
+      .catch((error) => console.error("Silme hatası:", error));
+  };
+
+  // Rename Modalını Aç
+  const openRenameModal = (deck) => {
+    setSelectedDeck(deck);
+    setDeckName(deck.name);
+    setRenameModalOpen(true);
+    setMenuOpen(null);
+  };
+
+  // Rename İşlemi
+  const handleRename = () => {
+    if (!deckName.trim()) return;
+
+    fetch(`${API_URL}/${selectedDeck.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ deckName }),
+    })
+      .then(() => {
+        setDecks(
+          decks.map((d) =>
+            d.id === selectedDeck.id ? { ...d, name: deckName } : d
+          )
+        );
+        setRenameModalOpen(false);
+      })
+      .catch((error) => console.error("Güncelleme hatası:", error));
   };
 
   return (
@@ -71,14 +121,24 @@ const Dashboard = () => {
             <p>Henüz deste bulunmuyor.</p>
           ) : (
             decks.map((deck) => (
-              <div
-                key={deck.id}
-                className="deck-card"
-                style={{ backgroundColor: deck.color }}
-                title={deck.name}
-              >
-                <h5>{deck.name}</h5>
-                <p>{deck.count} cards</p> {/* Kart sayısını gösteriyoruz */}
+              <div key={deck.id} className="deck-wrapper">
+                <div
+                  className="deck-card"
+                  style={{ backgroundColor: deck.color }}
+                  onClick={() => toggleMenu(deck.id)}
+                >
+                  <h5>{deck.name}</h5>
+                  <p>{deck.count} cards</p>
+                </div>
+                {menuOpen === deck.id && (
+                  <div className="deck-menu">
+                    <button onClick={() => openRenameModal(deck)}>
+                      Rename
+                    </button>
+                    <button onClick={() => deleteDeck(deck.id)}>Delete</button>
+                    <button>Add Cards</button>
+                  </div>
+                )}
               </div>
             ))
           )}
@@ -109,6 +169,38 @@ const Dashboard = () => {
                   Save
                 </button>
                 <button className="cancel-btn" onClick={closeModal}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Rename Modal */}
+        {renameModalOpen && (
+          <div className="modal">
+            <div className="modal-content small-modal">
+              <button
+                className="close-btn"
+                onClick={() => setRenameModalOpen(false)}
+              >
+                <i className="bi bi-x-lg"></i>
+              </button>
+              <h2>Rename Deck</h2>
+              <label>New Name:</label>
+              <input
+                type="text"
+                value={deckName}
+                onChange={(e) => setDeckName(e.target.value)}
+                placeholder="Enter new deck name"
+              />
+              <div className="modal-actions">
+                <button className="save-btn" onClick={handleRename}>
+                  Save
+                </button>
+                <button
+                  className="cancel-btn"
+                  onClick={() => setRenameModalOpen(false)}
+                >
                   Cancel
                 </button>
               </div>

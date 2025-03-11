@@ -41,25 +41,34 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateDeck([FromBody] Deck deck)
+        public async Task<IActionResult> CreateDeck([FromBody] CreateDeckDto deckDto)
         {
-            if (deck == null)
+            if (deckDto == null || string.IsNullOrWhiteSpace(deckDto.DeckName))
             {
                 return BadRequest();
             }
+            var deck = new Deck
+            {
+                DeckName = deckDto.DeckName,
+                UserId = 1, 
+            };
             await _deckService.TAddAsync(deck);
             return CreatedAtAction(nameof(GetDeckById), new { id = deck.DeckId }, deck);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateDeck(int id, [FromBody] Deck deck)
+        public async Task<IActionResult> UpdateDeck(int id, [FromBody] CreateDeckDto updateDto)
         {
-            if (id != deck.DeckId)
-                return BadRequest();
+            var deck = await _deckService.TGetByIdAsync(id);
+            if (deck == null)
+                return NotFound(); 
+
+            deck.DeckName = updateDto.DeckName; 
 
             await _deckService.TUpdateAsync(deck);
-            return NoContent();
+            return NoContent(); 
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDeck(int id)
