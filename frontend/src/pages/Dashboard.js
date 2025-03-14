@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import "bootstrap-icons/font/bootstrap-icons.css"; // Bootstrap ikonları
-import "./dashboard.css"; // CSS dosyasını içeri aktarıyoruz
+import "bootstrap-icons/font/bootstrap-icons.css";
+import "./dashboard.css";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const colors = ["#FFA500", "#4682B4", "#2F9E44", "#DC143C", "#8A2BE2"]; // Turuncu, Mavi, Yeşil, Kırmızı, Mor
   const [decks, setDecks] = useState([]);
+  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [renameModalOpen, setRenameModalOpen] = useState(false);
   const [deckName, setDeckName] = useState("");
@@ -110,7 +112,9 @@ const Dashboard = () => {
       })
       .catch((error) => console.error("Güncelleme hatası:", error));
   };
-
+  const goToDeck = (deckId) => {
+    navigate(`/deck/${deckId}`);
+  };
   return (
     <div className="dashboard-container">
       {/* Deste Alanı Kutusu */}
@@ -136,7 +140,9 @@ const Dashboard = () => {
                       Rename
                     </button>
                     <button onClick={() => deleteDeck(deck.id)}>Delete</button>
-                    <button>Add Cards</button>
+                    <button onClick={() => goToDeck(deck.id)}>
+                      Show Cards
+                    </button>
                   </div>
                 )}
               </div>

@@ -12,10 +12,12 @@ namespace API.Controllers
     public class DeckController : ControllerBase
     {
         private readonly IGenericService<Deck> _deckService;
+        private readonly IGenericService<Card> _cardService;
 
-        public DeckController(IGenericService<Deck> deckService)
+        public DeckController(IGenericService<Deck> deckService, IGenericService<Card> cardService)
         {
             _deckService = deckService;
+            _cardService = cardService;
         }
 
         [HttpGet]
@@ -32,12 +34,22 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Deck>> GetDeckById(int id)
+        public async Task<ActionResult<object>> GetDeckById(int id)
         {
             var deck = await _deckService.TGetByIdAsync(id);
             if (deck == null)
                 return NotFound();
-            return Ok(deck);
+
+            var deckList = await _cardService.TWhere(x => x.DeckId == id); 
+
+            var result = new
+            {
+                deck.DeckId,
+                deck.DeckName,
+                Cards = deckList.Select(x => new { x.CardId, x.FrontText }).ToList()
+            };
+
+            return Ok(result);
         }
 
         [HttpPost]
